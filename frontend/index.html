@@ -321,7 +321,7 @@
 
                     <div className="l-hero">
                         <div className="l-badge fade-up"><span className="dot"/>Stanford LLM x Law Hackathon</div>
-                        <h1 className="fade-up" style={{animationDelay:'.1s'}}>Carriers lose billions on freight claims. <span className="highlight">We find the defenses they miss.</span></h1>
+                        <h1 className="fade-up" style={{animationDelay:'.1s'}}>580,000 carriers. 5 legal defenses. <span className="highlight">Most never get checked.</span></h1>
                         <p className="fade-up" style={{animationDelay:'.2s'}}>Carmac reads your BOL and cargo claim, runs the Carmack Amendment analysis that takes your legal team hours, and drafts a citation-ready dispute letter. 35 seconds.</p>
                         <div className="l-ctas fade-up" style={{animationDelay:'.3s'}}>
                             <button className="l-cta-primary" onClick={onEnter}>Open App</button>
@@ -330,16 +330,16 @@
                     </div>
 
                     <div className="l-stats fade-up" style={{animationDelay:'.35s'}}>
-                        <div className="l-stat"><div className="val">$84K+</div><div className="label">Saved in Beta</div></div>
-                        <div className="l-stat"><div className="val">92%</div><div className="label">Defense Accuracy</div></div>
+                        <div className="l-stat"><div className="val">5</div><div className="label">Carmack Defenses</div></div>
                         <div className="l-stat"><div className="val">&lt;35s</div><div className="label">Per Analysis</div></div>
+                        <div className="l-stat"><div className="val">0</div><div className="label">Hallucinated Citations</div></div>
                     </div>
 
                     {/* The Problem */}
                     <div className="l-section fade-up" style={{animationDelay:'.4s',borderTop:'1px solid #1c1e26',paddingTop:72}}>
                         <div className="l-section-label">The Problem</div>
-                        <h2>73% of cargo claims have a viable Carmack defense. <span className="muted-word">Most carriers never check.</span></h2>
-                        <p>The Carmack Amendment gives carriers five common-law defenses against freight claims. But finding them requires reading the BOL, the claim, and cross-referencing case law. Claims departments process hundreds per month. Defenses slip through. Carriers overpay.</p>
+                        <h2>The Carmack Amendment gives carriers 5 defenses. <span className="muted-word">Finding them takes hours.</span></h2>
+                        <p>Each cargo claim requires reading the BOL, the claim, and cross-referencing case law. A transportation attorney charges $3,000+ per dispute. Claims departments process hundreds per month. Defenses slip through. Carriers overpay.</p>
                     </div>
 
                     {/* How it works */}
@@ -415,7 +415,7 @@
             );
         }
 
-        function IntelCard({claimant}){const intel=getIntel(claimant);if(!intel)return null;const rc=intel.recommendation==="DISPUTE"?"var(--green)":intel.recommendation==="PAY"?"var(--red)":"var(--amber)";return(<div className="intel-card fade-up"><div className="intel-badge">Network Intelligence</div><div className="intel-shipper">{claimant}</div><div className="intel-grid"><div className="intel-row"><span className="ir-label">Claims filed</span><span className="ir-value">{intel.claimsFiled}</span></div><div className="intel-row"><span className="ir-label">Avg claim</span><span className="ir-value">{fmtMoney(intel.avgClaim)}</span></div><div className="intel-row"><span className="ir-label">Dispute success</span><span className="ir-value">{intel.successRate}%</span></div><div className="intel-row"><span className="ir-label">Top defense</span><span className="ir-value">{intel.topDefense}</span></div></div><div className="intel-pattern">{intel.pattern}</div><div className="intel-rec" style={{color:rc}}>Recommendation: {intel.recommendation}</div></div>);}
+        function IntelCard({claimant}){const intel=getIntel(claimant);if(!intel)return null;const rc=intel.recommendation==="DISPUTE"?"var(--green)":intel.recommendation==="PAY"?"var(--red)":"var(--amber)";return(<div className="intel-card fade-up"><div className="intel-badge">Network Intelligence <span style={{fontWeight:400,fontStyle:"italic",opacity:.6,letterSpacing:0}}>&mdash; simulated</span></div><div className="intel-shipper">{claimant}</div><div className="intel-grid"><div className="intel-row"><span className="ir-label">Claims filed</span><span className="ir-value">{intel.claimsFiled}</span></div><div className="intel-row"><span className="ir-label">Avg claim</span><span className="ir-value">{fmtMoney(intel.avgClaim)}</span></div><div className="intel-row"><span className="ir-label">Dispute success</span><span className="ir-value">{intel.successRate}%</span></div><div className="intel-row"><span className="ir-label">Top defense</span><span className="ir-value">{intel.topDefense}</span></div></div><div className="intel-pattern">{intel.pattern}</div><div className="intel-rec" style={{color:rc}}>Recommendation: {intel.recommendation}</div></div>);}
 
         function LetterSection({letter}){const[copied,setCopied]=useState(false);if(!letter)return null;const isP=letter.letter_text.includes("pending")||letter.letter_text.includes("unavailable");return(<div className="letter-wrap fade-up"><h3>Dispute Letter{!isP&&<button className="btn-sm" onClick={async()=>{await navigator.clipboard.writeText(letter.letter_text);setCopied(true);setTimeout(()=>setCopied(false),2000);}}>{copied?"Copied!":"Copy"}</button>}</h3>{isP?<div className="letter-placeholder">Letter generation in progress...</div>:<div><div className="letter-body">{letter.letter_text}</div>{letter.citations.length>0&&<div className="citations-row">{letter.citations.map((c,i)=><span className="cite-pill" key={i}>{c}</span>)}</div>}</div>}</div>);}
 
@@ -609,6 +609,7 @@
             const maxSaved=Math.max(...mData.map(d=>d.saved));
 
             return(<div className="fade-up">
+                <div style={{fontSize:10,color:"var(--muted)",fontStyle:"italic",marginBottom:12}}>Sample carrier profile &mdash; demo data</div>
                 {/* Top row: stats + chart side by side */}
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
                     {/* Left: Key metrics */}
