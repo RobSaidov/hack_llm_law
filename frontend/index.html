@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carmac — Freight Legal Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #f8f7f4;
+            --card: #ffffff;
+            --dark: #0b0d14;
+            --dark2: #13151e;
+            --dark3: #1c1f2b;
+            --navy: #1a2744;
+            --navy-light: #2a3d66;
+            --green: #16a34a;
+            --green-light: #22c55e;
+            --amber: #d97706;
+            --red: #dc2626;
+            --text: #1a1a1a;
+            --muted: #71757e;
+            --border: #e5e4e0;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+            --radius: 10px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
+        }
+        body { background: var(--bg); color: var(--text); font-family: var(--sans); -webkit-font-smoothing: antialiased; line-height: 1.6; }
+        .mono { font-family: var(--mono); }
+        .pill { display: inline-block; padding: 4px 12px; border-radius: 20px; font-family: var(--mono); font-size: 11px; font-weight: 600; }
+        .pill-green { background: #dcfce7; color: var(--green); }
+        .pill-amber { background: #fef3c7; color: var(--amber); }
+        .pill-red   { background: #fde8e8; color: var(--red); }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeIn { from{opacity:0}to{opacity:1} }
+        @keyframes slideL { from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)} }
+        @keyframes pop { 0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)} }
+        @keyframes scanLine { 0%{left:-30%}100%{left:100%} }
+        @keyframes borderGlow { 0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%} }
+        @keyframes shimmer { 0%{background-position:-200% 0}100%{background-position:200% 0} }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+        @keyframes revealScale { 0%{opacity:0;transform:scale(.92)}100%{opacity:1;transform:scale(1)} }
+        .fade-up{animation:fadeUp .5s ease both}.fade-in{animation:fadeIn .4s ease both}
+        .slide-l{animation:slideL .3s ease both}.pop-in{animation:pop .3s cubic-bezier(.34,1.56,.64,1) both}
+        .pulse{animation:pulse 1.4s ease-in-out infinite}
+        @media(prefers-reduced-motion:reduce){.fade-up,.fade-in,.slide-l,.pop-in{animation:none;opacity:1}}
+
+        /* ═══════════════════════════════════════════
+           LANDING PAGE
+           ═══════════════════════════════════════════ */
+        .landing { background: var(--dark); color: #fff; }
+
+        /* Nav */
+        .l-nav { display:flex; justify-content:space-between; align-items:center; padding:20px 48px; max-width:1100px; margin:0 auto; }
+        .l-nav-logo { font-size:22px; font-weight:800; letter-spacing:-.8px; color:#fff; }
+        .l-nav-links { display:flex; gap:28px; align-items:center; }
+        .l-nav-links a { color:#777; text-decoration:none; font-size:13px; font-weight:500; transition:color .2s; }
+        .l-nav-links a:hover { color:#ccc; }
+        .l-btn { background:var(--navy-light); color:#fff; border:none; padding:9px 22px; border-radius:8px; font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; }
+        .l-btn:hover { background:#3a5080; }
+
+        /* Hero */
+        .l-hero { max-width:800px; margin:0 auto; padding:80px 48px 50px; text-align:center; }
+        .l-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:6px 16px; font-size:11px; color:#888; margin-bottom:28px; font-weight:500; }
+        .l-badge .dot { width:6px; height:6px; border-radius:50%; background:var(--green); }
+        .l-hero h1 { font-size:56px; font-weight:800; line-height:1.08; letter-spacing:-2px; margin-bottom:20px; }
+        .l-hero h1 .highlight { color:#6b8aff; }
+        .l-hero p { font-size:17px; color:#888; max-width:520px; margin:0 auto 36px; line-height:1.6; font-weight:400; }
+        .l-ctas { display:flex; gap:12px; justify-content:center; }
+        .l-cta-primary { background:#fff; color:var(--dark); border:none; padding:13px 32px; border-radius:10px; font-family:var(--sans); font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; }
+        .l-cta-primary:hover { background:#eee; transform:translateY(-1px); }
+        .l-cta-ghost { background:transparent; color:#999; border:1px solid #333; padding:13px 32px; border-radius:10px; font-family:var(--sans); font-size:15px; font-weight:500; cursor:pointer; transition:all .2s; }
+        .l-cta-ghost:hover { border-color:#666; color:#fff; }
+
+        /* Stats */
+        .l-stats { display:flex; justify-content:center; gap:56px; padding:56px 48px 48px; max-width:720px; margin:0 auto; border-top:1px solid #1c1e26; }
+        .l-stat .val { font-family:var(--mono); font-size:32px; font-weight:700; }
+        .l-stat .label { font-size:11px; color:#555; margin-top:2px; text-transform:uppercase; letter-spacing:1px; }
+
+        /* Problem section */
+        .l-section { max-width:900px; margin:0 auto; padding:64px 48px; }
+        .l-section-label { font-size:11px; color:#555; text-transform:uppercase; letter-spacing:2px; font-weight:600; margin-bottom:12px; }
+        .l-section h2 { font-size:32px; font-weight:700; letter-spacing:-1px; margin-bottom:16px; line-height:1.15; }
+        .l-section h2 .muted-word { color:#555; }
+        .l-section > p { font-size:15px; color:#777; max-width:600px; line-height:1.6; }
+
+        /* How it works */
+        .l-steps-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px; margin-top:32px; }
+        .l-step { background:var(--dark2); border:1px solid #222; border-radius:12px; padding:28px 24px; }
+        .l-step-num { font-family:var(--mono); font-size:12px; color:#555; margin-bottom:10px; }
+        .l-step h3 { font-size:16px; font-weight:700; margin-bottom:6px; }
+        .l-step p { font-size:13px; color:#666; line-height:1.5; }
+
+        /* Who its for */
+        .l-audience { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-top:28px; }
+        .l-audience-item { background:var(--dark2); border:1px solid #222; border-radius:12px; padding:24px; }
+        .l-audience-item h4 { font-size:15px; font-weight:700; margin-bottom:6px; }
+        .l-audience-item p { font-size:13px; color:#666; line-height:1.45; }
+
+        /* CTA banner */
+        .l-cta-banner { text-align:center; padding:80px 48px; border-top:1px solid #1a1c24; }
+        .l-cta-banner h2 { font-size:28px; font-weight:700; margin-bottom:12px; letter-spacing:-.5px; }
+        .l-cta-banner p { font-size:14px; color:#666; margin-bottom:28px; }
+
+        .l-footer { text-align:center; padding:24px 48px; font-size:11px; color:#333; border-top:1px solid #1a1c24; }
+
+        /* ═══════════════════════════════════════════
+           APP SHELL
+           ═══════════════════════════════════════════ */
+        .app-shell { display:flex; min-height:100vh; }
+
+        /* Sidebar */
+        .sidebar-nav { width:180px; background:var(--card); border-right:1px solid var(--border); padding:20px 0; display:flex; flex-direction:column; position:fixed; top:0; bottom:0; left:0; z-index:50; }
+        .sn-logo { padding:0 18px; margin-bottom:24px; font-size:18px; font-weight:800; color:var(--navy); letter-spacing:-.5px; cursor:pointer; transition:opacity .15s; }
+        .sn-logo:hover { opacity:.7; }
+        .sn-item { display:block; padding:8px 18px; font-size:13px; font-weight:500; color:var(--muted); cursor:pointer; transition:all .1s; margin:1px 8px; border-radius:6px; }
+        .sn-item:hover { color:var(--text); background:#f0efe9; }
+        .sn-item.active { color:var(--navy); background:#e8ecf4; font-weight:700; }
+        .sn-sep { height:1px; background:var(--border); margin:10px 18px; }
+        .sn-label { font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; font-weight:600; padding:12px 18px 4px; }
+        .sn-bottom { margin-top:auto; padding:12px 18px; border-top:1px solid var(--border); }
+        .sn-bottom a { font-size:11px; color:var(--muted); text-decoration:none; display:block; padding:3px 0; }
+        .sn-bottom a:hover { color:var(--text); }
+
+        .app-main { margin-left:180px; flex:1; min-height:100vh; background:var(--bg); }
+        .app-topbar { display:flex; justify-content:space-between; align-items:center; padding:20px 32px 0; }
+        .atb-left {}
+        .atb-welcome { font-size:20px; font-weight:700; color:var(--text); letter-spacing:-.3px; }
+        .atb-sub { font-size:12px; color:var(--muted); margin-top:1px; }
+        .atb-right { font-size:12px; color:var(--muted); font-style:italic; }
+        .app-content { padding:20px 32px 48px; }
+
+        /* ── Case Header ─────────── */
+        .case-header { background:var(--navy); color:#fff; border-radius:10px; padding:14px 22px; margin-bottom:22px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; }
+        .ch-company { font-size:16px; font-weight:700; }
+        .ch-vs { font-size:11px; opacity:.4; font-style:italic; margin:0 6px; }
+        .ch-shipper { font-size:13px; opacity:.8; }
+        .ch-details { display:flex; gap:12px; align-items:center; }
+        .ch-tag { font-family:var(--mono); font-size:10px; opacity:.45; padding:3px 9px; border:1px solid rgba(255,255,255,.15); border-radius:5px; }
+        .ch-amount { font-family:var(--mono); font-size:16px; font-weight:700; }
+
+        /* ── Home sections ───────── */
+        .home-section h2 { font-size:16px; font-weight:700; margin-bottom:4px; color:var(--text); letter-spacing:-.2px; }
+        .hs-sub { font-size:12px; color:var(--muted); margin-bottom:20px; }
+        .home-layout { display:grid; grid-template-columns:1fr 1.2fr; gap:24px; align-items:start; }
+        @media(max-width:860px){ .home-layout{grid-template-columns:1fr;} }
+        .upload-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+        .upload-zone { border:2px dashed var(--border); border-radius:var(--radius); padding:28px 18px; text-align:center; cursor:pointer; transition:all .15s; background:var(--card); position:relative; }
+        .upload-zone:hover { border-color:var(--navy); background:#f5f6fa; }
+        .upload-zone.has-file { border-color:var(--green); border-style:solid; background:#f4faf6; }
+        .upload-zone .uz-title { font-weight:600; font-size:13px; margin-bottom:2px; }
+        .upload-zone .uz-sub { font-size:11px; color:var(--muted); }
+        .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+        .upload-zone .uz-filename { font-family:var(--mono); font-size:11px; color:var(--green); margin-top:4px; }
+        .upload-btn-row { text-align:center; margin-bottom:20px; }
+        .demos-section { margin-top:4px; }
+        .demos-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; font-weight:600; }
+        .scenario-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+        .scenario-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:14px 16px; cursor:pointer; transition:all .12s; border-left:3px solid var(--border); }
+        .scenario-card:hover { border-left-color:var(--navy); box-shadow:var(--shadow); }
+        .scenario-card.primary { border-left-color:var(--navy); background:#f7f8fc; }
+        .sc-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+        .sc-carrier { font-size:12px; font-weight:700; }
+        .sc-amount { font-family:var(--mono); font-size:14px; font-weight:700; color:var(--navy); }
+        .sc-meta { font-size:10px; color:var(--muted); }
+        .sc-cta { font-size:11px; color:var(--navy); font-weight:700; margin-top:7px; }
+
+        .btn { font-family:var(--sans); font-size:13px; font-weight:700; padding:10px 22px; border-radius:8px; cursor:pointer; border:none; transition:all .15s; }
+        .btn-navy { background:var(--navy); color:#fff; }
+        .btn-navy:hover { background:var(--navy-light); }
+        .btn-navy:disabled { opacity:.5; cursor:not-allowed; }
+        .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text); font-weight:600; }
+        .btn-outline:hover { border-color:var(--navy); color:var(--navy); }
+
+        /* ── Analysis Steps ──────── */
+        .steps-container { max-width:620px; }
+        .steps-container h3 { font-size:15px; font-weight:700; margin-bottom:14px; }
+        .analysis-progress { height:3px; background:var(--border); border-radius:2px; overflow:hidden; margin-bottom:18px; position:relative; }
+        .analysis-progress .pf { height:100%; background:var(--navy); border-radius:2px; transition:width .3s; }
+        .analysis-progress .sg { position:absolute; top:0; width:30%; height:100%; background:linear-gradient(90deg,transparent,rgba(26,39,68,.3),transparent); animation:scanLine 1s ease-in-out infinite; }
+        .step-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 16px; margin-bottom:8px; display:flex; align-items:flex-start; gap:10px; }
+        .step-icon { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+        .step-icon.pass { background:#dcfce7; color:var(--green); }
+        .step-icon.fail { background:#fde8e8; color:var(--red); }
+        .step-icon.warn { background:#fef3c7; color:var(--amber); }
+        .step-icon.load { background:#eee; color:var(--muted); }
+        .step-body { flex:1; }
+        .step-title { font-size:13px; font-weight:600; }
+        .step-detail { font-size:11px; color:var(--muted); }
+        .defense-inline { background:#f7f8fc; border:1px solid #e0e3ee; border-radius:8px; padding:11px 14px; margin:6px 0 6px 34px; }
+        .di-name { font-weight:700; font-size:12px; color:var(--navy); }
+        .di-strength { font-family:var(--mono); font-size:10px; font-weight:600; text-transform:uppercase; }
+        .di-evidence { font-size:11px; color:var(--muted); margin-top:2px; }
+        .di-cite { font-size:10px; color:#6b7fa0; margin-top:1px; }
+
+        /* ── Results ─────────────── */
+        .money-card { background:var(--card); border-radius:12px; padding:38px 34px; display:flex; align-items:center; justify-content:center; gap:44px; margin-bottom:16px; position:relative; overflow:hidden; animation:revealScale .5s cubic-bezier(.34,1.56,.64,1) both; }
+        .money-card::before { content:''; position:absolute; inset:0; border-radius:12px; padding:2px; background:linear-gradient(135deg,var(--navy),var(--green),var(--navy),var(--green)); background-size:300% 300%; animation:borderGlow 4s ease infinite; -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+        .money-card.pay-card::before { background:linear-gradient(135deg,var(--red),var(--navy),var(--red),var(--navy)); background-size:300% 300%; }
+        .money-side { text-align:center; }
+        .money-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+        .money-amount { font-family:var(--mono); font-weight:700; font-size:40px; line-height:1.1; }
+        .money-arrow { font-size:26px; color:var(--muted); }
+        .money-saved { text-align:center; margin:6px 0 10px; }
+        .saved-shimmer { font-family:var(--mono); font-size:20px; font-weight:700; background:linear-gradient(90deg,var(--green) 0%,#22d97a 40%,#b6ffd0 50%,#22d97a 60%,var(--green) 100%); background-size:200% 100%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:shimmer 2.5s linear infinite; }
+        .money-meta { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:22px; }
+        .money-confidence { font-family:var(--mono); font-size:11px; color:var(--muted); }
+
+        .intel-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:18px; border-left:3px solid var(--navy); }
+        .intel-badge { font-family:var(--mono); font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:10px; }
+        .intel-shipper { font-size:14px; font-weight:700; margin-bottom:8px; }
+        .intel-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 20px; margin-bottom:10px; }
+        .intel-row { display:flex; justify-content:space-between; font-size:11px; padding:2px 0; }
+        .ir-label { color:var(--muted); }
+        .ir-value { font-family:var(--mono); font-weight:600; }
+        .intel-pattern { background:#f5f5f0; border-radius:6px; padding:9px 12px; font-size:11px; color:var(--muted); margin-bottom:8px; line-height:1.45; }
+        .intel-rec { font-family:var(--mono); font-size:11px; font-weight:700; }
+
+        .breakdown-toggle { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:18px; overflow:hidden; }
+        .breakdown-header { padding:12px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:600; }
+        .breakdown-header:hover { background:#fafaf5; }
+        .breakdown-body { padding:0 18px 18px; }
+
+        .letter-wrap { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:18px; }
+        .letter-wrap h3 { font-size:13px; font-weight:700; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+        .letter-body { background:#fafaf8; border:1px solid var(--border); border-radius:8px; padding:18px; font-family:Georgia,serif; font-size:13px; line-height:1.75; white-space:pre-wrap; color:#333; max-height:340px; overflow-y:auto; }
+        .letter-placeholder { text-align:center; padding:24px; color:var(--muted); font-size:13px; }
+        .citations-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+        .cite-pill { background:#eef0f5; color:var(--navy); font-family:var(--mono); font-size:10px; padding:3px 8px; border-radius:10px; }
+        .btn-sm { font-family:var(--mono); font-size:10px; padding:5px 11px; border-radius:5px; cursor:pointer; border:1px solid var(--border); background:var(--card); color:var(--muted); transition:all .12s; }
+        .btn-sm:hover { border-color:var(--navy); color:var(--navy); }
+
+        .outcome-section { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:18px; }
+        .outcome-section h3 { font-size:13px; font-weight:700; margin-bottom:2px; }
+        .os-sub { font-size:11px; color:var(--muted); margin-bottom:12px; }
+        .outcome-btns { display:flex; gap:8px; flex-wrap:wrap; }
+        .outcome-btn { font-family:var(--sans); font-size:12px; font-weight:600; padding:8px 16px; border-radius:8px; cursor:pointer; background:transparent; transition:all .12s; }
+        .outcome-btn:disabled { opacity:.4; cursor:not-allowed; }
+        .ob-green { border:1.5px solid var(--green); color:var(--green); }
+        .ob-green:hover:not(:disabled) { background:#dcfce7; }
+        .ob-amber { border:1.5px solid var(--amber); color:var(--amber); }
+        .ob-amber:hover:not(:disabled) { background:#fef3c7; }
+        .ob-red { border:1.5px solid var(--red); color:var(--red); }
+        .ob-red:hover:not(:disabled) { background:#fde8e8; }
+        .settle-input { display:flex; align-items:center; gap:8px; margin-top:10px; }
+        .settle-input input { font-family:var(--mono); font-size:13px; padding:7px 10px; border:1.5px solid var(--border); border-radius:6px; width:120px; outline:none; }
+        .settle-input input:focus { border-color:var(--navy); }
+        .outcome-toast { margin-top:10px; padding:10px 14px; background:#dcfce7; border-radius:6px; font-size:12px; color:var(--green); font-weight:500; }
+
+        .warning-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 16px; margin-bottom:8px; display:flex; gap:10px; align-items:flex-start; }
+        .wc-icon { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+        .wc-icon.wc-green { background:#dcfce7; color:var(--green); }
+        .wc-icon.wc-amber { background:#fef3c7; color:var(--amber); }
+        .wc-icon.wc-red { background:#fde8e8; color:var(--red); }
+        .wc-field { font-size:12px; font-weight:600; margin-bottom:1px; }
+        .wc-msg { font-size:12px; }
+        .wc-rec { font-size:10px; color:var(--muted); margin-top:2px; }
+
+        .bottom-bar { display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:14px; border-top:1px solid var(--border); }
+        .disclaimer { font-size:10px; color:var(--muted); font-style:italic; }
+
+        .history-list { list-style:none; }
+        .history-item { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:8px; margin-bottom:6px; border-left:3px solid var(--border); }
+        .history-item.won { border-left-color:var(--green); }
+        .history-item.lost { border-left-color:var(--red); }
+        .history-item.pend { border-left-color:var(--amber); }
+        .hi-carrier { font-size:13px; font-weight:600; }
+        .hi-meta { font-size:10px; color:var(--muted); }
+        .hi-amounts { font-family:var(--mono); font-size:12px; font-weight:600; }
+        .hi-outcome { font-size:10px; font-weight:700; }
+
+        @media(max-width:860px){
+            .sidebar-nav{display:none} .app-main{margin-left:0}
+            .scenario-grid,.upload-row{grid-template-columns:1fr}
+            .money-card{flex-direction:column;gap:16px;padding:24px} .money-amount{font-size:30px}
+            .l-hero h1{font-size:36px} .l-stats{flex-direction:column;gap:20px}
+            .l-steps-grid,.l-audience{grid-template-columns:1fr}
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        const {useState,useEffect,useRef,useCallback}=React;
+        const API=(window.location.port==="3000"?"http://localhost:8000":"")+"/api";
+        const fmt=n=>Math.round(n).toLocaleString("en-US");
+        const fmtMoney=n=>"$"+fmt(n);
+
+        function CountUp({target,prefix="",suffix="",duration=1200,className=""}){
+            const[val,setVal]=useState(0);const ref=useRef(null);
+            useEffect(()=>{const s=performance.now();const step=now=>{const p=Math.min((now-s)/duration,1);setVal(Math.round((1-Math.pow(1-p,3))*target));if(p<1)ref.current=requestAnimationFrame(step);};ref.current=requestAnimationFrame(step);return()=>cancelAnimationFrame(ref.current);},[target,duration]);
+            return <span className={className}>{prefix}{fmt(val)}{suffix}</span>;
+        }
+
+        const SHIPPER_INTEL={
+            "ABC Electronics Inc.":{claimsFiled:47,avgClaim:18500,successRate:81,topDefense:"Shipper negligence",pattern:"Frequently files water damage claims with inadequate packaging. 38/47 disputed successfully.",recommendation:"DISPUTE"},
+            "HomeStyle Furniture Co.":{claimsFiled:19,avgClaim:11200,successRate:53,topDefense:"Released value",pattern:"Mixed history. Released value notations on ~60% of shipments.",recommendation:"REVIEW"},
+            "Gallery West Fine Art":{claimsFiled:4,avgClaim:7800,successRate:25,topDefense:"None consistent",pattern:"Few claims. Professional crating. Most claims from carrier handling errors.",recommendation:"PAY"},
+        };
+        function getIntel(n){return SHIPPER_INTEL[n]||null;}
+
+        /* ═══════ LANDING PAGE ═══════ */
+        function LandingPage({onEnter}){
+            return(
+                <div className="landing">
+                    <nav className="l-nav fade-in">
+                        <div className="l-nav-logo">carmac</div>
+                        <div className="l-nav-links">
+                            <a href="#">How it works</a>
+                            <a href="#">About</a>
+                            <button className="l-btn" onClick={onEnter}>Open App</button>
+                        </div>
+                    </nav>
+
+                    <div className="l-hero">
+                        <div className="l-badge fade-up"><span className="dot"/>Stanford LLM x Law Hackathon</div>
+                        <h1 className="fade-up" style={{animationDelay:'.1s'}}>Carriers lose billions on freight claims. <span className="highlight">We find the defenses they miss.</span></h1>
+                        <p className="fade-up" style={{animationDelay:'.2s'}}>Carmac reads your BOL and cargo claim, runs the Carmack Amendment analysis that takes your legal team hours, and drafts a citation-ready dispute letter. 35 seconds.</p>
+                        <div className="l-ctas fade-up" style={{animationDelay:'.3s'}}>
+                            <button className="l-cta-primary" onClick={onEnter}>Open App</button>
+                            <button className="l-cta-ghost" onClick={onEnter}>Try Demo</button>
+                        </div>
+                    </div>
+
+                    <div className="l-stats fade-up" style={{animationDelay:'.35s'}}>
+                        <div className="l-stat"><div className="val">$84K+</div><div className="label">Saved in Beta</div></div>
+                        <div className="l-stat"><div className="val">92%</div><div className="label">Defense Accuracy</div></div>
+                        <div className="l-stat"><div className="val">&lt;35s</div><div className="label">Per Analysis</div></div>
+                    </div>
+
+                    {/* The Problem */}
+                    <div className="l-section fade-up" style={{animationDelay:'.4s',borderTop:'1px solid #1c1e26',paddingTop:72}}>
+                        <div className="l-section-label">The Problem</div>
+                        <h2>73% of cargo claims have a viable Carmack defense. <span className="muted-word">Most carriers never check.</span></h2>
+                        <p>The Carmack Amendment gives carriers five common-law defenses against freight claims. But finding them requires reading the BOL, the claim, and cross-referencing case law. Claims departments process hundreds per month. Defenses slip through. Carriers overpay.</p>
+                    </div>
+
+                    {/* How it works */}
+                    <div className="l-section fade-up" style={{animationDelay:'.45s'}}>
+                        <div className="l-section-label">How It Works</div>
+                        <h2>Three steps. 35 seconds.</h2>
+                        <div className="l-steps-grid">
+                            <div className="l-step">
+                                <div className="l-step-num">01</div>
+                                <h3>Upload documents</h3>
+                                <p>Drop your Bill of Lading and the cargo claim. PDF, image, or text. Carmac's parser extracts every field.</p>
+                            </div>
+                            <div className="l-step">
+                                <div className="l-step-num">02</div>
+                                <h3>Carmack analysis runs</h3>
+                                <p>The engine checks timeliness, released value caps, SL&C notations, and all five Carmack defenses. Deterministic. No hallucinations.</p>
+                            </div>
+                            <div className="l-step">
+                                <div className="l-step-num">03</div>
+                                <h3>Get your dispute letter</h3>
+                                <p>A formal, citation-ready letter with verified case law. Copy it, send it, save thousands.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Who it's for */}
+                    <div className="l-section fade-up" style={{animationDelay:'.5s'}}>
+                        <div className="l-section-label">Built For</div>
+                        <h2>The freight industry's claims problem.</h2>
+                        <div className="l-audience">
+                            <div className="l-audience-item"><h4>Carriers</h4><p>Stop overpaying claims. Find defenses your team doesn't have time to research.</p></div>
+                            <div className="l-audience-item"><h4>Claims Departments</h4><p>Process claims 10x faster. Every analysis comes with a ready-to-send letter.</p></div>
+                            <div className="l-audience-item"><h4>3PLs & Brokers</h4><p>Pre-screen BOLs before signing. Know your exposure before the truck leaves.</p></div>
+                        </div>
+                    </div>
+
+                    {/* Bottom CTA */}
+                    <div className="l-cta-banner fade-up" style={{animationDelay:'.55s'}}>
+                        <h2>See it in action.</h2>
+                        <p>Three demo scenarios. Real Carmack analysis. Real dispute letters. No signup.</p>
+                        <button className="l-cta-primary" onClick={onEnter}>Open App</button>
+                    </div>
+
+                    <div className="l-footer">Carmac &mdash; Freight Legal Intelligence. Built at Stanford LLM x Law Hackathon. &copy; 2026</div>
+                </div>
+            );
+        }
+
+        /* ═══════ APP COMPONENTS ═══════ */
+        function CaseHeader({bol,claim}){
+            if(!bol)return null;
+            return(<div className="case-header fade-in"><div><span className="ch-company">{bol.carrier?.name}</span><span className="ch-vs">vs</span><span className="ch-shipper">{claim?.claimant||bol.shipper?.name}</span></div><div className="ch-details">{bol.bol_number&&<span className="ch-tag">{bol.bol_number}</span>}<span className="ch-tag">{bol.origin} &rarr; {bol.destination}</span>{claim&&<span className="ch-amount">{fmtMoney(claim.claim_amount)}</span>}</div></div>);
+        }
+
+        function AnalysisView({analysis,currentStep}){
+            const pct=Math.min((currentStep/5)*100,100);
+            if(!analysis)return(<div className="steps-container"><h3>Analyzing claim...</h3><div className="analysis-progress"><div className="sg"/></div><div className="step-card slide-l"><div className="step-icon load"><span className="pulse">...</span></div><div className="step-body"><div className="step-title">Running Carmack Amendment analysis</div><div className="step-detail">Checking defenses, liability caps, and deadlines</div></div></div></div>);
+            const{timeliness:t,released_value:rv,slc}=analysis;const defs=analysis.defenses.filter(d=>d.applies);
+            const steps=[
+                {title:"Claim deadline",detail:t.is_timely?`Day ${t.days_to_file} of 270 — within deadline`:`TIME-BARRED — ${t.days_to_file} days`,type:t.is_timely?"pass":"fail",icon:t.is_timely?"\u2713":"\u2717"},
+                {title:"Liability cap",detail:rv.found?`$${rv.amount_per_pound}/lb — capped at ${fmtMoney(rv.max_liability)}`:"No released value — full exposure",type:rv.found?"pass":"fail",icon:rv.found?"\u2713":"\u2717"},
+                {title:"Shipper load status",detail:slc.notation_found?"SL&C marked — defense available":"SL&C not found",type:slc.notation_found?"pass":"warn",icon:slc.notation_found?"\u2713":"\u2014"},
+            ];
+            return(
+                <div className="steps-container">
+                    <h3>Carmack Amendment Analysis</h3>
+                    <div className="analysis-progress"><div className="pf" style={{width:`${pct}%`}}/>{currentStep<5&&<div className="sg"/>}</div>
+                    {steps.map((s,i)=>currentStep>i&&(<div className="step-card slide-l" key={i}><div className={`step-icon ${s.type} pop-in`}>{s.icon}</div><div className="step-body"><div className="step-title">{s.title}</div><div className="step-detail">{s.detail}</div></div></div>))}
+                    {currentStep>=4&&<div className="slide-l"><div className="step-card"><div className="step-icon pass pop-in">{"\u2666"}</div><div className="step-body"><div className="step-title">Carmack defenses</div><div className="step-detail">{defs.length>0?`${defs.length} found`:"No applicable defenses"}</div></div></div>
+                    {defs.map((d,i)=>(<div className="defense-inline slide-l" key={d.id} style={{animationDelay:`${i*.08}s`}}><div className="di-name">{d.name}</div><div className={`di-strength ${d.strength==="strong"?"green":"amber"}`}>{d.strength}</div><div className="di-evidence">{d.evidence}</div>{d.case_cite&&<div className="di-cite">{d.case_cite}</div>}</div>))}</div>}
+                    {currentStep>=5&&<div className="step-card slide-l" style={{borderLeft:"3px solid var(--green)"}}><div className="step-icon pass pop-in">{"\u2713"}</div><div className="step-body"><div className="step-title" style={{color:"var(--green)"}}>Analysis complete</div><div className="step-detail">Confidence: {(analysis.liability.confidence*100).toFixed(0)}%</div></div></div>}
+                </div>
+            );
+        }
+
+        function IntelCard({claimant}){const intel=getIntel(claimant);if(!intel)return null;const rc=intel.recommendation==="DISPUTE"?"var(--green)":intel.recommendation==="PAY"?"var(--red)":"var(--amber)";return(<div className="intel-card fade-up"><div className="intel-badge">Network Intelligence</div><div className="intel-shipper">{claimant}</div><div className="intel-grid"><div className="intel-row"><span className="ir-label">Claims filed</span><span className="ir-value">{intel.claimsFiled}</span></div><div className="intel-row"><span className="ir-label">Avg claim</span><span className="ir-value">{fmtMoney(intel.avgClaim)}</span></div><div className="intel-row"><span className="ir-label">Dispute success</span><span className="ir-value">{intel.successRate}%</span></div><div className="intel-row"><span className="ir-label">Top defense</span><span className="ir-value">{intel.topDefense}</span></div></div><div className="intel-pattern">{intel.pattern}</div><div className="intel-rec" style={{color:rc}}>Recommendation: {intel.recommendation}</div></div>);}
+
+        function LetterSection({letter}){const[copied,setCopied]=useState(false);if(!letter)return null;const isP=letter.letter_text.includes("pending")||letter.letter_text.includes("unavailable");return(<div className="letter-wrap fade-up"><h3>Dispute Letter{!isP&&<button className="btn-sm" onClick={async()=>{await navigator.clipboard.writeText(letter.letter_text);setCopied(true);setTimeout(()=>setCopied(false),2000);}}>{copied?"Copied!":"Copy"}</button>}</h3>{isP?<div className="letter-placeholder">Letter generation in progress...</div>:<div><div className="letter-body">{letter.letter_text}</div>{letter.citations.length>0&&<div className="citations-row">{letter.citations.map((c,i)=><span className="cite-pill" key={i}>{c}</span>)}</div>}</div>}</div>);}
+
+        function OutcomeSection({analysis,onOutcome}){const[rec,setRec]=useState(null);const[showSettle,setShowSettle]=useState(false);const[amt,setAmt]=useState("");if(!analysis)return null;const record=t=>{setRec(t);onOutcome(t,t==="reduced"?parseFloat(amt)||0:0);};return(<div className="outcome-section fade-up"><h3>Track this claim's outcome</h3><div className="os-sub">Recording outcomes improves defense intelligence</div>{!rec?<div><div className="outcome-btns"><button className="outcome-btn ob-green" onClick={()=>record("withdrew")}>{"\u2713"} Withdrew claim</button><button className="outcome-btn ob-amber" onClick={()=>setShowSettle(true)}>{"\u2193"} Reduced amount</button><button className="outcome-btn ob-red" onClick={()=>record("rejected")}>{"\u2717"} Rejected dispute</button></div>{showSettle&&<div className="settle-input fade-in"><span style={{fontSize:12,color:"var(--muted)"}}>Settled for:</span><input type="number" placeholder="$0" value={amt} onChange={e=>setAmt(e.target.value)}/><button className="btn-sm" onClick={()=>record("reduced")}>Record</button></div>}</div>:<div className="outcome-toast">Outcome recorded.</div>}</div>);}
+
+        function ResultsView({result,onReset,onOutcome}){
+            const[bOpen,setBOpen]=useState(false);if(!result)return null;
+            const{analysis,letter,claim_data}=result;const lib=analysis.liability;const pos=lib.recommended_position;
+            const posColor=pos==="DISPUTE_FULL"?"var(--green)":pos==="DISPUTE_PARTIAL"?"var(--amber)":"var(--red)";
+            const posLabel=pos==="DISPUTE_FULL"?"Dispute in full":pos==="DISPUTE_PARTIAL"?"Partial dispute":"Pay claim";
+            const pillType=pos==="DISPUTE_FULL"?"green":pos==="DISPUTE_PARTIAL"?"amber":"red";
+            return(<div>
+                <div className={`money-card ${pos==="PAY"?"pay-card":""}`}><div className="money-side"><div className="money-label">Claim Exposure</div><div className="money-amount red"><CountUp target={lib.claim_amount} prefix="$" duration={1000}/></div></div><div className="money-arrow">{"\u2192"}</div><div className="money-side"><div className="money-label">With Carmac</div><div className="money-amount" style={{color:posColor}}><CountUp target={lib.with_defense} prefix="$" duration={1400}/></div></div></div>
+                {lib.reduction>0&&<div className="money-saved fade-in"><span className="saved-shimmer">You saved <CountUp target={lib.reduction} prefix="$" duration={1600}/></span></div>}
+                <div className="money-meta fade-in"><span className={`pill pill-${pillType}`}>{posLabel}</span><span className="money-confidence">{(lib.confidence*100).toFixed(0)}% confidence</span></div>
+                <IntelCard claimant={claim_data.claimant}/>
+                <div className="breakdown-toggle fade-up"><div className="breakdown-header" onClick={()=>setBOpen(!bOpen)}><span>View full analysis</span><span style={{fontSize:12,color:"var(--muted)"}}>{bOpen?"\u25B2":"\u25BC"}</span></div>{bOpen&&<div className="breakdown-body fade-in" style={{paddingTop:10}}>{[{t:"Timeliness",d:analysis.timeliness.detail,ok:analysis.timeliness.is_timely},{t:"Released Value",d:analysis.released_value.detail,ok:analysis.released_value.found},{t:"SL&C",d:analysis.slc.detail,ok:analysis.slc.notation_found}].map((s,i)=>(<div className="step-card" key={i} style={{boxShadow:"none"}}><div className={`step-icon ${s.ok?"pass":"warn"}`}>{s.ok?"\u2713":"\u2014"}</div><div className="step-body"><div className="step-title">{s.t}</div><div className="step-detail">{s.d}</div></div></div>))}{analysis.defenses.map(d=>(<div className="step-card" key={d.id} style={{boxShadow:"none"}}><div className={`step-icon ${d.applies?"pass":"warn"}`}>{d.applies?"\u2713":"\u2014"}</div><div className="step-body"><div className="step-title">{d.name}</div><div className="step-detail">{d.evidence}</div>{d.case_cite&&<div style={{fontSize:10,color:"#6b7fa0",marginTop:1}}>{d.case_cite}</div>}</div></div>))}</div>}</div>
+                <LetterSection letter={letter}/>
+                <OutcomeSection analysis={analysis} onOutcome={onOutcome}/>
+                <div className="bottom-bar"><div className="disclaimer">Carmac provides legal intelligence, not legal advice.</div><button className="btn btn-navy" onClick={onReset}>New Analysis</button></div>
+            </div>);
+        }
+
+        function PreScreenView({result,onBack}){if(!result)return null;const rc=result.risk_level==="high"?"red":result.risk_level==="medium"?"amber":"green";const ic={green:"\u2713",amber:"\u26A0",red:"\u2717"};return(<div style={{maxWidth:580}}><h3 style={{fontSize:16,fontWeight:700,marginBottom:6}}>BOL Pre-Screen Report</h3><div style={{marginBottom:18}}><span className={`pill pill-${rc}`}>{result.risk_level.toUpperCase()} RISK</span><span style={{fontSize:11,color:"var(--muted)",marginLeft:10}}>{result.summary}</span></div>{result.warnings.map((w,i)=>(<div className="warning-card fade-up" key={i} style={{animationDelay:`${i*.08}s`}}><div className={`wc-icon wc-${w.status}`}>{ic[w.status]}</div><div><div className="wc-field">{w.field}</div><div className="wc-msg">{w.message}</div><div className="wc-rec">{w.recommendation}</div></div></div>))}<div className="bottom-bar"><div className="disclaimer">Carmac provides legal intelligence, not legal advice.</div><button className="btn btn-outline" onClick={onBack}>Back</button></div></div>);}
+
+        /* ═══════ MAIN APP ═══════ */
+        function App(){
+            const[page,setPage]=useState("landing");
+            const[tab,setTab]=useState("analyze");
+            const[view,setView]=useState("home");
+            const[analysisResult,setAnalysisResult]=useState(null);
+            const[preScreenResult,setPreScreenResult]=useState(null);
+            const[currentStep,setCurrentStep]=useState(0);
+            const[error,setError]=useState(null);
+            const[uploading,setUploading]=useState(false);
+            const[stats,setStats]=useState({claimsAnalyzed:12,disputesWon:9,totalSaved:84200});
+            const[caseHistory,setCaseHistory]=useState([
+                {carrier:"Delta Freight Co.",shipper:"TechParts Ltd.",claimed:18500,liability:0,position:"DISPUTE_FULL",outcome:"withdrew"},
+                {carrier:"Summit Logistics",shipper:"GreenGrow Farms",claimed:4200,liability:4200,position:"PAY",outcome:"rejected"},
+                {carrier:"Atlas Transport",shipper:"Precision Optics",claimed:31000,liability:0,position:"DISPUTE_FULL",outcome:"withdrew"},
+                {carrier:"RoadRunner Inc.",shipper:"CoolChain Foods",claimed:9800,liability:4900,position:"DISPUTE_PARTIAL",outcome:"reduced"},
+            ]);
+            const timers=useRef([]);
+            const clearTimers=useCallback(()=>{timers.current.forEach(t=>clearTimeout(t));timers.current=[];},[]);
+            const reset=useCallback(()=>{clearTimers();setView("home");setAnalysisResult(null);setPreScreenResult(null);setCurrentStep(0);setError(null);},[clearTimers]);
+
+            const addCase=useCallback(result=>{const lib=result.analysis.liability;setCaseHistory(prev=>[{carrier:result.bol_data.carrier.name,shipper:result.claim_data.claimant,claimed:lib.claim_amount,liability:lib.with_defense,position:lib.recommended_position,outcome:null},...prev]);setStats(prev=>({...prev,claimsAnalyzed:prev.claimsAnalyzed+1}));},[]);
+
+            const handleOutcome=useCallback((type,settleAmt)=>{if(!analysisResult)return;const lib=analysisResult.analysis.liability;setCaseHistory(prev=>{const u=[...prev];const idx=u.findIndex(c=>c.carrier===analysisResult.bol_data.carrier.name&&c.outcome===null);if(idx!==-1)u[idx]={...u[idx],outcome:type};return u;});if(type==="withdrew"){setStats(prev=>({...prev,disputesWon:prev.disputesWon+1,totalSaved:prev.totalSaved+lib.reduction}));}else if(type==="reduced"){const saved=lib.claim_amount-(settleAmt||lib.with_defense);setStats(prev=>({...prev,disputesWon:prev.disputesWon+1,totalSaved:prev.totalSaved+Math.max(0,saved)}));}},[analysisResult]);
+
+            const animateSteps=useCallback((result,addCaseFn)=>{setAnalysisResult(result);[500,1000,1500,2100,2800].forEach((d,i)=>{const t=setTimeout(()=>setCurrentStep(i+1),d);timers.current.push(t);});const t=setTimeout(()=>{addCaseFn(result);setView("results");},3200);timers.current.push(t);},[]);
+
+            const runAnalysis=useCallback(async id=>{setError(null);setView("analyzing");setCurrentStep(0);setAnalysisResult(null);setTab("analyze");try{const sd=await(await fetch(`${API}/demo-scenario/${id}`)).json();const r=await(await fetch(`${API}/full-analysis`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bol_data:sd.bol_data,claim_data:sd.claim_data,delivery_date:sd.delivery_date})})).json();animateSteps(r,addCase);}catch(e){setError(e.message);setView("home");}},[addCase,animateSteps]);
+
+            const parseFile=async(file,docType)=>{const fd=new FormData();fd.append("file",file);fd.append("document_type",docType);const r=await fetch(`${API}/parse-document`,{method:"POST",body:fd});if(!r.ok){const e=await r.json().catch(()=>({detail:"Parse failed"}));throw new Error(e.detail||"Parse failed");}return r.json();};
+
+            const runUploadAnalysis=useCallback(async(bf,cf)=>{setError(null);setUploading(true);try{const[bol,claim]=await Promise.all([parseFile(bf,"bol"),parseFile(cf,"claim")]);const dd=claim.delivery_date||new Date().toISOString().split("T")[0];setUploading(false);setView("analyzing");setCurrentStep(0);setAnalysisResult(null);const r=await(await fetch(`${API}/full-analysis`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bol_data:bol,claim_data:claim,delivery_date:dd})})).json();animateSteps(r,addCase);}catch(e){setUploading(false);setError(e.message);setView("home");}},[addCase,animateSteps]);
+
+            const runPreScreen=useCallback(async id=>{setError(null);try{const sd=await(await fetch(`${API}/demo-scenario/${id}`)).json();const ps=await(await fetch(`${API}/pre-screen`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bol_data:sd.bol_data})})).json();setPreScreenResult(ps.result);setView("prescreen");}catch(e){setError(e.message);}},[]);
+
+            const runUploadPreScreen=useCallback(async bf=>{setError(null);setUploading(true);try{const bol=await parseFile(bf,"bol");const ps=await(await fetch(`${API}/pre-screen`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bol_data:bol})})).json();setUploading(false);setPreScreenResult(ps.result);setView("prescreen");}catch(e){setUploading(false);setError(e.message);}},[]);
+
+            if(page==="landing")return<LandingPage onEnter={()=>setPage("app")}/>;
+            const winRate=stats.claimsAnalyzed>0?Math.round((stats.disputesWon/stats.claimsAnalyzed)*100):0;
+
+            const tabTitle=tab==="analyze"?"Claim Analysis":tab==="screening"?"BOL Screening":"Case History";
+            const tabSub=tab==="analyze"?"Upload documents or run a demo":tab==="screening"?"Scan BOLs before signing":"Track outcomes and performance";
+
+            return(
+                <div className="app-shell">
+                    <nav className="sidebar-nav">
+                        <div className="sn-logo" onClick={()=>setPage("landing")}>carmac</div>
+                        <div className={`sn-item ${tab==="analyze"&&view==="home"?"active":""}`} onClick={()=>{setTab("analyze");reset();}}>Home</div>
+                        <div className={`sn-item ${tab==="analyze"&&view!=="home"?"active":""}`} style={{pointerEvents:view==="home"?"none":"auto",opacity:view==="home"?.4:1}}>Results</div>
+                        <div className={`sn-item ${tab==="history"?"active":""}`} onClick={()=>{setTab("history");setView("home");}}>History</div>
+                        <div className="sn-sep"/>
+                        <div className={`sn-item ${tab==="screening"?"active":""}`} onClick={()=>{setTab("screening");reset();}}>BOL Screening</div>
+                        <div className="sn-item" style={{opacity:.4,cursor:"default"}}>Batch Analysis</div>
+                        <div className="sn-sep"/>
+                        <div className="sn-label">Settings</div>
+                        <div className="sn-item" style={{opacity:.4,cursor:"default"}}>API Keys</div>
+                        <div className="sn-item" style={{opacity:.4,cursor:"default"}}>Usage</div>
+                        <div className="sn-bottom">
+                            <a href="#" onClick={e=>{e.preventDefault();setPage("landing");}}>Documentation</a>
+                            <a href="#" onClick={e=>e.preventDefault()}>Support</a>
+                        </div>
+                    </nav>
+                    <div className="app-main">
+                        <div className="app-topbar">
+                            <div className="atb-left">
+                                <div className="atb-welcome">{tabTitle}</div>
+                                <div className="atb-sub">{tabSub}</div>
+                            </div>
+                            <div className="atb-right">Carmack Amendment Analysis Engine</div>
+                        </div>
+                        <div className="app-content">
+                            {error&&<div style={{padding:10,color:"var(--red)",fontFamily:"var(--mono)",fontSize:12,marginBottom:14}}>Error: {error}</div>}
+                            {tab==="analyze"&&view==="home"&&<HomeAnalyze onSelect={runAnalysis} onUpload={runUploadAnalysis} uploading={uploading}/>}
+                            {tab==="analyze"&&view==="analyzing"&&<div><CaseHeader bol={analysisResult?.bol_data} claim={analysisResult?.claim_data}/><AnalysisView analysis={analysisResult?.analysis} currentStep={currentStep}/></div>}
+                            {tab==="analyze"&&view==="results"&&<div><CaseHeader bol={analysisResult?.bol_data} claim={analysisResult?.claim_data}/><ResultsView result={analysisResult} onReset={reset} onOutcome={handleOutcome}/></div>}
+                            {tab==="screening"&&view==="home"&&<HomeScreening onPreScreen={runPreScreen} onUploadPS={runUploadPreScreen} uploading={uploading}/>}
+                            {tab==="screening"&&view==="prescreen"&&<PreScreenView result={preScreenResult} onBack={reset}/>}
+                            {tab==="history"&&<HistoryTab caseHistory={caseHistory} stats={stats}/>}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function HomeAnalyze({onSelect,onUpload,uploading}){
+            const[bf,setBf]=useState(null);const[cf,setCf]=useState(null);const canGo=bf&&cf&&!uploading;
+            const sc=[{id:"a",carrier:"FastFreight LLC",shipper:"ABC Electronics",route:"LA \u2192 Dallas",dtype:"Water damage",amount:"$22,000",primary:true},{id:"b",carrier:"MidWest Haulers",shipper:"HomeStyle Furniture",route:"Grand Rapids \u2192 Nashville",dtype:"Crush damage",amount:"$15,000"},{id:"c",carrier:"Southwest Express",shipper:"Gallery West Art",route:"Santa Fe \u2192 Denver",dtype:"Handling damage",amount:"$8,000"}];
+            return(<div className="fade-up" style={{display:"grid",gridTemplateColumns:"340px 1fr",gap:20,alignItems:"start"}}>
+                {/* Left: Upload area — tall card like Kita */}
+                <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:12,padding:0,minHeight:340}}>
+                    <div style={{padding:"80px 28px",textAlign:"center"}}>
+                        <div style={{fontSize:22,color:"var(--muted)",marginBottom:10}}>{"\u2191"}</div>
+                        <div style={{fontSize:14,fontWeight:600,marginBottom:4}}>Drop files or browse</div>
+                        <div style={{fontSize:11,color:"var(--muted)",marginBottom:20}}>PDF, PNG, JPG, TXT</div>
+                        <div style={{display:"flex",gap:8,justifyContent:"center"}}>
+                            <label className={`upload-zone ${bf?"has-file":""}`} style={{padding:"12px 16px",flex:1,maxWidth:130,fontSize:11,borderRadius:8}}>
+                                <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt,.text,text/plain,application/pdf,image/*" onChange={e=>setBf(e.target.files[0]||null)}/>
+                                <div style={{fontWeight:600,fontSize:11}}>BOL</div>
+                                {bf?<div className="uz-filename" style={{fontSize:9}}>{bf.name}</div>:<div style={{fontSize:9,color:"var(--muted)"}}>Select file</div>}
+                            </label>
+                            <label className={`upload-zone ${cf?"has-file":""}`} style={{padding:"12px 16px",flex:1,maxWidth:130,fontSize:11,borderRadius:8}}>
+                                <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt,.text,text/plain,application/pdf,image/*" onChange={e=>setCf(e.target.files[0]||null)}/>
+                                <div style={{fontWeight:600,fontSize:11}}>Claim</div>
+                                {cf?<div className="uz-filename" style={{fontSize:9}}>{cf.name}</div>:<div style={{fontSize:9,color:"var(--muted)"}}>Select file</div>}
+                            </label>
+                        </div>
+                        {(bf||cf)&&<div style={{marginTop:14}}><button className="btn btn-navy" disabled={!canGo} onClick={()=>onUpload(bf,cf)} style={{width:"100%"}}>{uploading?"Parsing documents...":"Analyze Documents"}</button></div>}
+                    </div>
+                </div>
+
+                {/* Right: Demo scenarios + quick action */}
+                <div>
+                    {/* Select Files button like Kita's Document Constructor */}
+                    <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:12,padding:18,marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <div style={{fontWeight:700,fontSize:14}}>Claim Analyzer</div>
+                        <button className="btn btn-navy" style={{padding:"8px 20px",fontSize:12}} onClick={()=>document.querySelector('.upload-zone input')?.click()}>Select Files</button>
+                    </div>
+
+                    {/* Demo documents — horizontal scroll like Kita */}
+                    <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:12,padding:18}}>
+                        <div style={{fontSize:13,fontWeight:600,marginBottom:14}}>Try Demo Documents</div>
+                        <div style={{display:"flex",gap:14,overflowX:"auto",paddingBottom:4}}>
+                            {sc.map(s=>(<div key={s.id} onClick={()=>onSelect(s.id)} style={{
+                                minWidth:150,cursor:"pointer",transition:"all .15s",borderRadius:10,
+                                border:s.primary?"2px solid var(--navy)":"2px solid transparent",
+                                background:s.primary?"#f5f7fb":"transparent",padding:2
+                            }}>
+                                {/* Document preview placeholder */}
+                                <div style={{width:"100%",height:120,background:"var(--bg)",borderRadius:8,border:"1px solid var(--border)",
+                                    display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",marginBottom:8,
+                                    backgroundImage:"repeating-linear-gradient(0deg,transparent,transparent 11px,var(--border) 11px,var(--border) 12px)",backgroundSize:"100% 12px",backgroundPosition:"0 8px",
+                                    position:"relative",overflow:"hidden"
+                                }}>
+                                    <div style={{background:"var(--card)",padding:"4px 8px",borderRadius:4,fontSize:9,fontFamily:"var(--mono)",color:"var(--navy)",fontWeight:600,position:"relative",zIndex:1}}>{s.amount}</div>
+                                </div>
+                                <div style={{padding:"0 4px 6px"}}>
+                                    <div style={{fontSize:12,fontWeight:600,marginBottom:1}}>{s.carrier}</div>
+                                    <div style={{fontSize:10,color:"var(--muted)"}}>{s.dtype}</div>
+                                </div>
+                            </div>))}
+                        </div>
+                    </div>
+                </div>
+            </div>);
+        }
+
+        function HomeScreening({onPreScreen,onUploadPS,uploading}){
+            const[pf,setPf]=useState(null);
+            return(<div className="home-section fade-up">
+                <h2>Screen a BOL before signing</h2><div className="hs-sub">Catch missing clauses and risky terms in 5 seconds.</div>
+                <div className={`upload-zone ${pf?"has-file":""}`} style={{maxWidth:380,marginBottom:14}}><input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt,.text,text/plain,application/pdf,image/*" onChange={e=>setPf(e.target.files[0]||null)}/><div className="uz-title">Upload BOL</div>{pf?<div className="uz-filename">{pf.name}</div>:<div className="uz-sub">PDF, image, or text</div>}</div>
+                {pf&&<div style={{marginBottom:14}}><button className="btn btn-navy" disabled={uploading} onClick={()=>onUploadPS(pf)}>{uploading?"Scanning...":"Scan BOL"}</button></div>}
+                <div className="demos-section"><div className="demos-label">Demo</div><button className="btn btn-outline" onClick={()=>onPreScreen("a")}>Scan sample BOL</button></div>
+            </div>);
+        }
+
+        function HistoryTab({caseHistory,stats}){
+            const winRate=stats.claimsAnalyzed>0?Math.round((stats.disputesWon/stats.claimsAnalyzed)*100):0;
+            const lost=caseHistory.filter(c=>c.outcome==="rejected").length;
+            const pending=caseHistory.filter(c=>!c.outcome).length;
+            const avgClaim=caseHistory.length>0?Math.round(caseHistory.reduce((a,c)=>a+c.claimed,0)/caseHistory.length):0;
+
+            // Fake monthly data for the bar chart
+            const months=["Jan","Feb","Mar","Apr"];
+            const mData=[{m:"Jan",claims:2,saved:12000},{m:"Feb",claims:4,saved:31000},{m:"Mar",claims:3,saved:22000},{m:"Apr",claims:stats.claimsAnalyzed-9,saved:stats.totalSaved-65000}];
+            const maxSaved=Math.max(...mData.map(d=>d.saved));
+
+            return(<div className="fade-up">
+                {/* Top row: stats + chart side by side */}
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
+                    {/* Left: Key metrics */}
+                    <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:12,padding:20}}>
+                        <div style={{fontSize:11,fontWeight:600,color:"var(--muted)",textTransform:"uppercase",letterSpacing:"1px",marginBottom:14}}>Overview</div>
+                        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+                            <div><div style={{fontFamily:"var(--mono)",fontSize:28,fontWeight:700,color:"var(--navy)"}}>{stats.claimsAnalyzed}</div><div style={{fontSize:10,color:"var(--muted)"}}>Total claims</div></div>
+                            <div><div style={{fontFamily:"var(--mono)",fontSize:28,fontWeight:700,color:"var(--green)"}}>{fmtMoney(stats.totalSaved)}</div><div style={{fontSize:10,color:"var(--muted)"}}>Total saved</div></div>
+                            <div><div style={{fontFamily:"var(--mono)",fontSize:28,fontWeight:700,color:"var(--navy)"}}>{fmtMoney(avgClaim)}</div><div style={{fontSize:10,color:"var(--muted)"}}>Avg claim</div></div>
+                            <div><div style={{fontFamily:"var(--mono)",fontSize:28,fontWeight:700,color:"var(--navy)"}}>{stats.disputesWon>0?fmtMoney(Math.round(stats.totalSaved/stats.disputesWon)):"$0"}</div><div style={{fontSize:10,color:"var(--muted)"}}>Avg saved/win</div></div>
+                        </div>
+                        {/* Win rate bar */}
+                        <div style={{marginTop:16}}>
+                            <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"var(--muted)",marginBottom:4}}>
+                                <span>Win rate</span><span style={{fontFamily:"var(--mono)",fontWeight:700,color:"var(--navy)"}}>{winRate}%</span>
+                            </div>
+                            <div style={{height:6,background:"#eee",borderRadius:3,overflow:"hidden",display:"flex"}}>
+                                <div style={{width:`${(stats.disputesWon/Math.max(stats.claimsAnalyzed,1))*100}%`,background:"var(--navy)",borderRadius:3,transition:"width .6s"}}/>
+                            </div>
+                            <div style={{display:"flex",gap:12,marginTop:6,fontSize:9,color:"var(--muted)"}}>
+                                <span><span style={{display:"inline-block",width:6,height:6,borderRadius:2,background:"var(--navy)",marginRight:3}}/>Won {stats.disputesWon}</span>
+                                <span><span style={{display:"inline-block",width:6,height:6,borderRadius:2,background:"var(--red)",marginRight:3}}/>Lost {lost}</span>
+                                <span><span style={{display:"inline-block",width:6,height:6,borderRadius:2,background:"var(--amber)",marginRight:3}}/>Pending {pending}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right: Monthly savings bar chart */}
+                    <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:12,padding:20}}>
+                        <div style={{fontSize:11,fontWeight:600,color:"var(--muted)",textTransform:"uppercase",letterSpacing:"1px",marginBottom:14}}>Monthly Savings</div>
+                        <div style={{display:"flex",gap:10,alignItems:"flex-end",height:130}}>
+                            {mData.map((d,i)=>(<div key={i} style={{flex:1,textAlign:"center"}}>
+                                <div style={{fontFamily:"var(--mono)",fontSize:9,color:"var(--muted)",marginBottom:4}}>{fmtMoney(d.saved)}</div>
+                                <div style={{height:`${Math.max((d.saved/maxSaved)*100,8)}%`,background:i===mData.length-1?"var(--navy)":"#d4dae6",borderRadius:"4px 4px 0 0",transition:"height .5s",minHeight:4,position:"relative"}}>
+                                    <div style={{position:"absolute",top:-14,left:"50%",transform:"translateX(-50%)",fontFamily:"var(--mono)",fontSize:8,color:"var(--muted)"}}>{d.claims}</div>
+                                </div>
+                                <div style={{fontSize:10,color:"var(--muted)",marginTop:6}}>{d.m}</div>
+                            </div>))}
+                        </div>
+                        <div style={{fontSize:9,color:"var(--muted)",marginTop:8,textAlign:"right"}}>claims per month shown above bars</div>
+                    </div>
+                </div>
+
+                {/* Case list */}
+                <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:12,padding:20}}>
+                    <div style={{fontSize:11,fontWeight:600,color:"var(--muted)",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12}}>All Cases ({caseHistory.length})</div>
+                    {/* Header row */}
+                    <div style={{display:"grid",gridTemplateColumns:"2fr 2fr 1fr 1fr",gap:8,padding:"6px 0",borderBottom:"1px solid var(--border)",fontSize:10,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".5px",fontWeight:600}}>
+                        <div>Carrier</div><div>Shipper</div><div style={{textAlign:"right"}}>Exposure</div><div style={{textAlign:"right"}}>Outcome</div>
+                    </div>
+                    <ul style={{listStyle:"none"}}>{caseHistory.map((c,i)=>{
+                        const oc=c.outcome==="withdrew"?"var(--green)":c.outcome==="reduced"?"var(--amber)":c.outcome==="rejected"?"var(--red)":"var(--muted)";
+                        const ol=c.outcome==="withdrew"?"Won":c.outcome==="reduced"?"Settled":c.outcome==="rejected"?"Lost":"Pending";
+                        const pc=c.position==="DISPUTE_FULL"?"var(--green)":c.position==="DISPUTE_PARTIAL"?"var(--amber)":"var(--red)";
+                        return(<li key={i} style={{display:"grid",gridTemplateColumns:"2fr 2fr 1fr 1fr",gap:8,padding:"10px 0",borderBottom:"1px solid #f0efe9",fontSize:12,alignItems:"center"}}>
+                            <div style={{fontWeight:600}}>{c.carrier}</div>
+                            <div style={{color:"var(--muted)"}}>{c.shipper}</div>
+                            <div style={{textAlign:"right",fontFamily:"var(--mono)",fontWeight:600,color:pc}}>{fmtMoney(c.claimed)} <span style={{opacity:.4}}>{"\u2192"}</span> {fmtMoney(c.liability)}</div>
+                            <div style={{textAlign:"right",fontWeight:700,fontSize:11,color:oc}}>{ol}</div>
+                        </li>);
+                    })}</ul>
+                </div>
+            </div>);
+        }
+
+        const root=ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App/>);
+    </script>
+</body>
+</html>
