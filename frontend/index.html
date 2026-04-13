@@ -322,7 +322,7 @@
                     <div className="l-hero">
                         <div className="l-badge fade-up"><span className="dot"/>Stanford LLM x Law Hackathon</div>
                         <h1 className="fade-up" style={{animationDelay:'.1s'}}>580,000 carriers. 5 legal defenses. <span className="highlight">Most never get checked.</span></h1>
-                        <p className="fade-up" style={{animationDelay:'.2s'}}>Carmac reads your BOL and cargo claim, runs the Carmack Amendment analysis that takes your legal team hours, and drafts a citation-ready dispute letter. 35 seconds.</p>
+                        <p className="fade-up" style={{animationDelay:'.2s'}}>Carmac reads your BOL and cargo claim, runs the Carmack Amendment analysis that takes your legal team hours, and drafts a citation-ready dispute letter. In seconds, not days.</p>
                         <div className="l-ctas fade-up" style={{animationDelay:'.3s'}}>
                             <button className="l-cta-primary" onClick={onEnter}>Open App</button>
                             <button className="l-cta-ghost" onClick={onEnter}>Try Demo</button>
@@ -331,7 +331,7 @@
 
                     <div className="l-stats fade-up" style={{animationDelay:'.35s'}}>
                         <div className="l-stat"><div className="val">5</div><div className="label">Carmack Defenses</div></div>
-                        <div className="l-stat"><div className="val">&lt;35s</div><div className="label">Per Analysis</div></div>
+                        <div className="l-stat"><div className="val">100%</div><div className="label">Reproducible</div></div>
                         <div className="l-stat"><div className="val">0</div><div className="label">Hallucinated Citations</div></div>
                     </div>
 
@@ -345,7 +345,7 @@
                     {/* How it works */}
                     <div className="l-section fade-up" style={{animationDelay:'.45s'}}>
                         <div className="l-section-label">How It Works</div>
-                        <h2>Three steps. 35 seconds.</h2>
+                        <h2>Three steps. Seconds, not days.</h2>
                         <div className="l-steps-grid">
                             <div className="l-step">
                                 <div className="l-step-num">01</div>
@@ -488,16 +488,11 @@
                 <div className="app-shell">
                     <nav className="sidebar-nav">
                         <div className="sn-logo" onClick={()=>setPage("landing")}>carmac</div>
-                        <div className={`sn-item ${tab==="analyze"&&view==="home"?"active":""}`} onClick={()=>{setTab("analyze");reset();}}>Home</div>
-                        <div className={`sn-item ${tab==="analyze"&&view!=="home"?"active":""}`} style={{pointerEvents:view==="home"?"none":"auto",opacity:view==="home"?.4:1}}>Results</div>
+                        <div className={`sn-item ${tab==="analyze"?"active":""}`} onClick={()=>{setTab("analyze");reset();}}>New Analysis</div>
                         <div className={`sn-item ${tab==="history"?"active":""}`} onClick={()=>{setTab("history");setView("home");}}>History</div>
                         <div className="sn-sep"/>
                         <div className={`sn-item ${tab==="screening"?"active":""}`} onClick={()=>{setTab("screening");reset();}}>BOL Screening</div>
-                        <div className="sn-item" style={{opacity:.4,cursor:"default"}}>Batch Analysis</div>
                         <div className="sn-sep"/>
-                        <div className="sn-label">Settings</div>
-                        <div className="sn-item" style={{opacity:.4,cursor:"default"}}>API Keys</div>
-                        <div className="sn-item" style={{opacity:.4,cursor:"default"}}>Usage</div>
                         <div className="sn-bottom">
                             <a href="#" onClick={e=>{e.preventDefault();setPage("landing");}}>Documentation</a>
                             <a href="#" onClick={e=>e.preventDefault()}>Support</a>
